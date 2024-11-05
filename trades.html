@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h2 class="Stockwatch">StockWatch</h2>
+        <nav class="navigation">
+            <a href="index.html">Home</a>
+            <a href="trades.html">Trades</a>
+            <a href="compare.html">Compare</a>
+            <a href="calculator.html">Calculator</a>
+            <a href="search.html">Stock Search</a>
+            <a href="help.html">Help</a>
+        </nav>
+    </header>
+    <main class="container">
+        <h1>Trading Journal</h1>
+
+        <!-- Form to Add New Trade -->
+        <section>
+            <form id="tradeForm">
+                <input type="text" id="symbol" placeholder="Symbol (e.g., AAPL)" required>
+                <input type="date" id="entryDate" required>
+                <input type="number" id="entryPrice" placeholder="Entry Price" step="0.01" required>
+                <input type="date" id="exitDate" placeholder="Exit Date (optional)">
+                <input type="number" id="exitPrice" placeholder="Exit Price (optional)" step="0.01">
+                <input type="number" id="quantity" placeholder="Quantity" required>
+                <button type="submit">Add Trade</button>
+            </form>
+        </section>
+
+        <!-- Table to display trades -->
+        <section>
+            <h2>Trade List</h2>
+            <table id="tradeTable">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Entry Date</th>
+                        <th>Entry Price</th>
+                        <th>Exit Date</th>
+                        <th>Exit Price</th>
+                        <th>Quantity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Trade rows will be added dynamically here -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Modal for Delete Confirmation -->
+        <div id="confirmModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <p>Are you sure you want to delete this trade?</p>
+                <button id="confirmDelete">Yes, Delete</button>
+                <button id="cancelDelete">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Include the JavaScript -->
+        <script src="script.js"></script>
+    </main>
+</body>
+</html>

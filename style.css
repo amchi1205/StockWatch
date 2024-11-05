@@ -1,0 +1,198 @@
+/* Global Styles - Applies to all pages */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Header styling */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 100px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+header .navigation a {
+    color: white;
+    text-decoration: none;
+    padding: 0 15px;
+    font-weight: 400;
+}
+
+header .navigation a:hover {
+    text-decoration: underline;
+}
+
+/* Home, Stock Search, and Help Page Styling */
+body {
+    padding-top: 80px;
+    background-color: #f4f6f9;
+    color: #2c3e50;
+}
+
+.container {
+    padding: 40px;
+    text-align: center;
+}
+
+/* Watch List Page Specific Styles */
+body.watch-list {
+    background-color: #e5eef3;
+}
+
+.watch-list .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+/* Restrict the size of the Profit & Loss Chart */
+.watch-list .profit-chart {
+    width: 100%;
+    max-width: 600px; /* Set max width to prevent expansion */
+    height: 400px; /* Fixed height */
+    margin: 0 auto; /* Center the chart */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa;
+}
+
+
+.watch-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.watch-list table th, .watch-list table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.watch-list table th {
+    background-color: #2c3e50;
+    color: white;
+    font-weight: 600;
+}
+
+.watch-list table td {
+    background-color: #ffffff;
+    color: #2c3e50;
+}
+
+.watch-list .edit-btn {
+    background-color: #3498db;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+.watch-list .delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+}
+
+/* Styles for the Trading Journal Page */
+body.journal .container {
+    padding: 40px;
+    text-align: center;
+}
+
+#tradeForm {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+#tradeForm input, #tradeForm button {
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#tradeTable {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+#tradeTable th, #tradeTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content {
+    text-align: center;
+}
+
+.modal-content button {
+    margin: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+#confirmDelete {
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+#cancelDelete {
+    background-color: grey;
+    color: white;
+    border: none;
+}
+
+/* Buttons */
+.edit-btn {
+    background-color: blue;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
