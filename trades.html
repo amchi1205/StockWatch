@@ -4,56 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading Journal</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <header>
-        <h2 class="Stockwatch">StockWatch</h2>
+        <h2>StockWatch - Trading Journal</h2>
         <nav class="navigation">
-            <a href="index.html">Home</a>
-            <a href="trades.html">Trades</a>
-            <a href="compare.html">Compare</a>
-            <a href="calculator.html">Calculator</a>
-            <a href="search.html">Stock Search</a>
-            <a href="help.html">Help</a>
+            <a href="/">Home</a>
+            <a href="trades">Trades</a>
+            <a href="compare">Compare</a>
+            <a href="calculator">Calculator</a>
+            <a href="search">Stock Search</a>
+            <a href="help">Help</a>
         </nav>
     </header>
+
     <main class="container">
         <h1>Trading Journal</h1>
 
-        <!-- Form to Add New Trade -->
-        <section>
-            <form id="tradeForm">
-                <input type="text" id="symbol" placeholder="Symbol (e.g., AAPL)" required>
-                <input type="date" id="entryDate" required>
-                <input type="number" id="entryPrice" placeholder="Entry Price" step="0.01" required>
-                <input type="date" id="exitDate" placeholder="Exit Date (optional)">
-                <input type="number" id="exitPrice" placeholder="Exit Price (optional)" step="0.01">
-                <input type="number" id="quantity" placeholder="Quantity" required>
-                <button type="submit">Add Trade</button>
-            </form>
-        </section>
+        <p class="description">
+            Track your stock trades to monitor performance, update entries as needed, and analyze your portfolio over time.
+        </p>
 
-        <!-- Table to display trades -->
-        <section>
-            <h2>Trade List</h2>
-            <table id="tradeTable">
-                <thead>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Entry Date</th>
-                        <th>Entry Price</th>
-                        <th>Exit Date</th>
-                        <th>Exit Price</th>
-                        <th>Quantity</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Trade rows will be added dynamically here -->
-                </tbody>
-            </table>
-        </section>
+        <form id="tradeForm">
+            <input type="text" id="symbol" placeholder="Symbol (e.g., AAPL)" required>
+            <input type="date" id="entryDate" required>
+            <input type="number" id="entryPrice" placeholder="Entry Price" step="0.01" required>
+            <input type="date" id="exitDate" placeholder="Exit Date (optional)">
+            <input type="number" id="exitPrice" placeholder="Exit Price (optional)" step="0.01">
+            <input type="number" id="quantity" placeholder="Quantity" required>
+            <button type="submit">Add Trade</button>
+        </form>
+
+        <h2>Trade Journal</h2>
+        <table id="tradeTable">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Entry Date</th>
+                    <th>Entry Price</th>
+                    <th>Exit Date</th>
+                    <th>Exit Price</th>
+                    <th>Quantity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tradeRows">
+                <!-- Trade rows will be dynamically added here -->
+            </tbody>
+        </table>
+
+        <!-- Undo Button -->
+        <button id="undoButton" style="display:none;">Undo Last Delete</button>
 
         <!-- Modal for Delete Confirmation -->
         <div id="confirmModal" class="modal" style="display:none;">
@@ -64,8 +66,85 @@
             </div>
         </div>
 
-        <!-- Include the JavaScript -->
-        <script src="script.js"></script>
+        <script>
+            // Pre-fill the stock symbol field if it exists in localStorage
+            const prefillSymbol = localStorage.getItem('stockSymbol');
+            if (prefillSymbol) {
+                document.getElementById('symbol').value = prefillSymbol;
+                localStorage.removeItem('stockSymbol'); // Clear it after pre-filling
+            }
+        
+            // Data to hold trades
+            const tradeData = [];
+        
+            // Function to render table rows
+            function renderRows() {
+                const tbody = document.getElementById('tradeRows');
+                tbody.innerHTML = '';  // Clear existing rows
+        
+                tradeData.forEach((trade, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${trade.symbol}</td>
+                        <td>${trade.entryDate}</td>
+                        <td>${trade.entryPrice}</td>
+                        <td>${trade.exitDate}</td>
+                        <td>${trade.exitPrice}</td>
+                        <td>${trade.quantity}</td>
+                        <td><button onclick="confirmDelete(${index})">Delete</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+        
+            // Handle form submission
+            document.getElementById('tradeForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+        
+                const symbol = document.getElementById('symbol').value;
+                const entryDate = document.getElementById('entryDate').value;
+                const entryPrice = document.getElementById('entryPrice').value;
+                const exitDate = document.getElementById('exitDate').value;
+                const exitPrice = document.getElementById('exitPrice').value;
+                const quantity = document.getElementById('quantity').value;
+        
+                // Add new trade to the data
+                tradeData.push({
+                    symbol,
+                    entryDate,
+                    entryPrice,
+                    exitDate,
+                    exitPrice,
+                    quantity
+                });
+        
+                // Re-render the table
+                renderRows();
+        
+                // Reset form
+                document.getElementById('tradeForm').reset();
+            });
+        
+            // Confirm delete functionality
+            function confirmDelete(index) {
+                const modal = document.getElementById('confirmModal');
+                modal.style.display = 'block';
+        
+                document.getElementById('confirmDelete').onclick = function () {
+                    // Remove trade from data
+                    tradeData.splice(index, 1);
+                    renderRows();
+                    modal.style.display = 'none';
+                };
+        
+                document.getElementById('cancelDelete').onclick = function () {
+                    modal.style.display = 'none';
+                };
+            }
+        
+            // Initially render rows if there is data
+            renderRows();
+        </script>
     </main>
 </body>
 </html>

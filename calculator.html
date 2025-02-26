@@ -4,46 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Investment Return Calculator</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="calculator">
 
-    <header>
-        <h2>StockWatch - Investment Return Calculator</h2>
-        <nav class="navigation">
-            <a href="index.html">Home</a>
-            <a href="trades.html">Trades</a>
-            <a href="compare.html">Compare</a>
-            <a href="calculator.html">Calculator</a>
-            <a href="search.html">Stock Search</a>
-            <a href="help.html">Help</a>
-        </nav>
-    </header>
+<header>
+    <h2>StockWatch - Investment Return Calculator</h2>
+    <nav class="navigation">
+        <a href="/">Home</a>
+        <a href="trades">Trades</a>
+        <a href="compare">Compare</a>
+        <a href="calculator">Calculator</a>
+        <a href="search">Stock Search</a>
+        <a href="help">Help</a>
+    </nav>
+</header>
 
-    <main class="container">
-        <h1>Investment Return Calculator</h1>
+<main class="container">
+    <h1>Investment Return Calculator</h1>
 
-        <section id="investmentSection" style="margin-top: 20px;">
-            <p>Calculate potential returns based on your investment:</p>
-            <input type="number" id="investmentAmount" placeholder="Investment Amount ($)" step="0.01" required>
-            <input type="number" id="expectedReturn1" placeholder="Expected Return Stock 1 (%)" step="0.01" required>
-            <input type="number" id="expectedReturn2" placeholder="Expected Return Stock 2 (%)" step="0.01" required>
-            <button type="button" onclick="calculateReturns()">Calculate Returns</button>
-            <p>Stock 1 Potential Return: $<span id="returnStock1"></span></p>
-            <p>Stock 2 Potential Return: $<span id="returnStock2"></span></p>
-        </section>
-    </main>
+    <section id="investmentSection" style="margin-top: 20px;">
+        <p>Calculate potential returns based on your stock holdings:</p>
 
-    <script>
-        function calculateReturns() {
-            let amount = parseFloat(document.getElementById('investmentAmount').value);
-            let return1 = parseFloat(document.getElementById('expectedReturn1').value);
-            let return2 = parseFloat(document.getElementById('expectedReturn2').value);
+        <!-- Input Fields -->
+        <input type="text" id="stockSymbol" placeholder="Enter Stock Symbol (e.g., AAPL)" required>
+        <input type="number" id="quantityOfStocks" placeholder="Quantity of Stocks Owned" required>
+        <input type="number" id="expectedReturn" placeholder="Expected Annual Return (%)" step="0.01" required>
+        <select id="investmentPeriod">
+            <option value="1">1 Year</option>
+            <option value="5">5 Years</option>
+            <option value="10">10 Years</option>
+        </select>
+        <button type="button" onclick="calculateReturns()">Calculate Returns</button>
 
-            document.getElementById('returnStock1').innerText = (amount * (1 + return1 / 100)).toFixed(2);
-            document.getElementById('returnStock2').innerText = (amount * (1 + return2 / 100)).toFixed(2);
+        <h3>Results:</h3>
+        <p>Current Stock Price: $<span id="currentStockPrice">--</span></p>
+        <p>Potential Return: $<span id="returnStock">--</span></p>
+    </section>
+</main>
+
+<script>
+    async function calculateReturns() {
+        // Get the values from the input fields
+        const symbol = document.getElementById('stockSymbol').value.trim().toUpperCase(); // Use the same key 'symbol'
+        const quantity = parseFloat(document.getElementById('quantityOfStocks').value); // Use the key 'quantity'
+        const returnPercentage = parseFloat(document.getElementById('expectedReturn').value); // Use 'returnPercentage'
+        const years = parseInt(document.getElementById('investmentPeriod').value); // Use 'years'
+
+        if (!symbol || isNaN(quantity) || isNaN(returnPercentage) || isNaN(years)) {
+            alert("Please fill out all fields with valid values.");
+            return;
         }
-    </script>
+
+        try {
+            // Make the POST request to the correct API endpoint
+            const response = await fetch('http://127.0.0.1:5002/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    symbol: symbol, 
+                    quantity: quantity, 
+                    returnPercentage: returnPercentage, 
+                    years: years
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "An unknown error occurred.");
+            }
+
+            const data = await response.json();
+
+            // Update the result section with the data
+            document.getElementById('currentStockPrice').textContent = data.currentPrice.toFixed(2);
+            document.getElementById('returnStock').textContent = data.potentialReturn.toFixed(2);
+        } catch (error) {
+            alert(`Error: ${error.message}`);
+        }
+    }
+</script>
 
 </body>
 </html>

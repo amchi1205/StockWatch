@@ -4,37 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Search</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <header>
-        <h2 class="Stockwatch - Search Stocks">StockWatch</h2>
-        <nav class="navigation">
-            <a href="index.html">Home</a>
-            <a href="trades.html">Trades</a>
-            <a href="compare.html">Compare</a>
-            <a href="calculator.html">Calculator</a>
-            <a href="search.html">Stock Search</a>
-            <a href="help.html">Help</a>
-        </nav>
-    </header>
+<body class="search-page">
 
-    <main class="container">
-        <h1>Search for Stocks</h1>
-        <form id="stockSearchForm">
-            <input type="text" id="searchQuery" placeholder="Enter stock ticker or name" required>
-            <button type="submit">Search</button>
-        </form>
+<header>
+    <h2>StockWatch - Stock Search</h2>
+    <nav class="navigation">
+        <a href="/">Home</a>
+        <a href="trades">Trades</a>
+        <a href="compare">Compare</a>
+        <a href="calculator">Calculator</a>
+        <a href="search">Stock Search</a>
+        <a href="help">Help</a>
+    </nav>
+</header>
 
-        <!-- Search result display -->
-        <div id="searchResult" style="display: none; margin-top: 20px;">
-            <h2>Results for <span id="resultSymbol"></span></h2>
-            <p>Price: $<span id="resultPrice">123.45</span></p>
-            <p>Market Cap: <span id="resultMarketCap">500B</span></p>
-            <button id="addToTradesbtn">Add to Trades</button>
-        </div>
-    </main>
+<main class="container">
+    <h1>Search for Stocks</h1>
 
-    <script src="script.js"></script>
+    <!-- Form to Search Stock Symbol -->
+    <form id="searchForm">
+        <input type="text" id="searchSymbol" placeholder="Enter Stock Symbol (e.g., AAPL)" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Stock Information -->
+    <section id="stockInfo" style="display: none; margin-top: 20px;">
+        <h2>Stock Information</h2>
+        <p><strong>Name:</strong> <span id="infoName"></span></p>
+        <p><strong>Symbol:</strong> <span id="infoSymbol"></span></p>
+        <p><strong>Market Cap:</strong> $<span id="infoMarketCap"></span> billion</p>
+        <p><strong>Industry:</strong> <span id="infoIndustry"></span></p>
+        <p><strong>Website:</strong> <a href="#" id="infoWebsite" target="_blank"></a></p>
+        <button id="addToTradeJournal">Add to Trade Journal</button>
+    </section>
+</main>
+
+<script>
+    const API_KEY = 'csoc6bhr01qt3r34997gcsoc6bhr01qt3r349980';
+
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const symbol = document.getElementById('searchSymbol').value.toUpperCase();
+
+        // Fetch company profile data
+        fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${API_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data || !data.name) {
+                    alert(`Data for ${symbol} is not available.`);
+                    return;
+                }
+
+                // Display company profile data
+                document.getElementById('infoName').textContent = data.name;
+                document.getElementById('infoSymbol').textContent = data.ticker;
+                document.getElementById('infoMarketCap').textContent = (data.marketCapitalization / 1e3).toFixed(2);  // Convert to billions
+                document.getElementById('infoIndustry').textContent = data.finnhubIndustry;
+                document.getElementById('infoWebsite').textContent = data.weburl;
+                document.getElementById('infoWebsite').href = data.weburl;
+
+                document.getElementById('stockInfo').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error fetching stock data:', error);
+                alert(`Failed to fetch data for ${symbol}`);
+            });
+    });
+
+    document.getElementById('addToTradeJournal').addEventListener('click', function() {
+        const symbol = document.getElementById('infoSymbol').textContent;
+
+        // Store the stock symbol in localStorage for use in the Trade Journal page
+        localStorage.setItem('stockSymbol', symbol);
+
+        // Redirect to the Trade Journal page
+        window.location.href = 'trades.html';
+    });
+</script>
+
 </body>
 </html>

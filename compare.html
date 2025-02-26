@@ -4,19 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compare Stocks</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="compare-page">
 
 <header>
     <h2>StockWatch - Compare Stocks</h2>
     <nav class="navigation">
-        <a href="index.html">Home</a>
-        <a href="trades.html">Trades</a>
-        <a href="compare.html">Compare</a>
-        <a href="calculator.html">Calculator</a>
-        <a href="search.html">Stock Search</a>
-        <a href="help.html">Help</a>
+        <a href="/">Home</a>
+        <a href="trades">Trades</a>
+        <a href="compare">Compare</a>
+        <a href="calculator">Calculator</a>
+        <a href="search">Stock Search</a>
+        <a href="help">Help</a>
     </nav>
 </header>
 
@@ -28,29 +28,179 @@
         <div class="stock-input">
             <h2>Stock 1</h2>
             <input type="text" id="symbol1" placeholder="Symbol (e.g., AAPL)" required>
-            <input type="number" id="price1" placeholder="Current Price" step="0.01" required>
-            <input type="number" id="peRatio1" placeholder="P/E Ratio" step="0.01">
-            <input type="number" id="marketCap1" placeholder="Market Cap (in billions)" step="0.01">
-            <input type="text" id="range1" placeholder="52-Week Range (e.g., 100-200)">
-            <input type="number" id="dividend1" placeholder="Dividend Yield (%)" step="0.01">
-            <input type="number" id="volume1" placeholder="Volume (in millions)" step="0.01">
-            <input type="number" id="beta1" placeholder="Beta (Volatility)" step="0.01">
         </div>
 
         <div class="stock-input">
             <h2>Stock 2</h2>
             <input type="text" id="symbol2" placeholder="Symbol (e.g., MSFT)" required>
-            <input type="number" id="price2" placeholder="Current Price" step="0.01" required>
-            <input type="number" id="peRatio2" placeholder="P/E Ratio" step="0.01">
-            <input type="number" id="marketCap2" placeholder="Market Cap (in billions)" step="0.01">
-            <input type="text" id="range2" placeholder="52-Week Range (e.g., 100-200)">
-            <input type="number" id="dividend2" placeholder="Dividend Yield (%)" step="0.01">
-            <input type="number" id="volume2" placeholder="Volume (in millions)" step="0.01">
-            <input type="number" id="beta2" placeholder="Beta (Volatility)" step="0.01">
         </div>
-
+        
         <button type="submit">Compare</button>
     </form>
+
+    <!-- Comparison Result Display -->
+    <section id="comparisonResult" style="display: none; margin-top: 20px;">
+        <h2>Comparison Result</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th> (<span id="resultSymbol1"></span>)</th>
+                    <th> (<span id="resultSymbol2"></span>)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Current Price</td><td id="resultPrice1"></td><td id="resultPrice2"></td></tr>
+                <tr><td>52-Week High</td><td id="resultHigh1"></td><td id="resultHigh2"></td></tr>
+                <tr><td>52-Week Low</td><td id="resultLow1"></td><td id="resultLow2"></td></tr>
+                <tr><td>PE Ratio</td><td id="resultPERatio1"></td><td id="resultPERatio2"></td></tr>
+                <tr><td>Market Cap</td><td id="resultMarketCap1"></td><td id="resultMarketCap2"></td></tr>
+                <tr><td>Dividend Yield</td><td id="resultDividendYield1"></td><td id="resultDividendYield2"></td></tr>
+            </tbody>
+        </table>
+
+        <!-- Graph Display -->
+        <section id="graphContainer" style="margin-top: 20px;">
+            <h2>Stock Comparison Graph</h2>
+            <img id="comparisonGraph" src="" alt="Stock Comparison Graph" />
+        </section>        
+    </section>
+</main>
+
+<script>
+    const API_KEY = 'csoc6bhr01qt3r34997gcsoc6bhr01qt3r349980';  // Finnhub API Key
+    const ALPHA_VANTAGE_KEY = 'NU9SOCGPML1JZ9MY'; // Alpha Vantage API Key
+
+    document.getElementById('compareForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const symbol1 = document.getElementById('symbol1').value.toUpperCase();
+        const symbol2 = document.getElementById('symbol2').value.toUpperCase();
+
+        // Fetch data for both stocks
+        fetchStockData(symbol1, '1');
+        fetchStockData(symbol2, '2');
+    });
+
+    function fetchStockData(symbol, stockNumber) {
+        // Fetch the stock quote from Finnhub
+        const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${API_KEY}`;
+        
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(`Data for ${symbol}:`, data);  // Log the entire response to check for volume data
+                
+                if (!data || !data.c) {
+                    alert(`Data for ${symbol} is not available. Check the symbol and try again.`);
+                    return;
+                }
+
+                // Populate stock data for current price, 52-week high/low
+                document.getElementById(`resultSymbol${stockNumber}`).textContent = symbol;
+                document.getElementById(`resultPrice${stockNumber}`).textContent = `$${data.c.toFixed(2)}`;
+                document.getElementById(`resultHigh${stockNumber}`).textContent = `$${data.h.toFixed(2)}`;
+                document.getElementById(`resultLow${stockNumber}`).textContent = `$${data.l.toFixed(2)}`;
+
+                // Now fetch the detailed data from Alpha Vantage
+                fetchAlphaVantageData(symbol, stockNumber);
+
+                // If it's the second stock, send data to the graph service
+                if (stockNumber === '2') {
+                    fetchGraphData(symbol, data.c);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching stock data from Finnhub:', error);
+                alert(`Failed to fetch data for ${symbol}. Please try again later.`);
+            });
+    }
+
+    function fetchAlphaVantageData(symbol, stockNumber) {
+        const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_KEY}`;
+        
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.Note) {
+                    alert("Alpha Vantage API limit exceeded. Please try again later.");
+                    return;
+                }
+
+                // Get PE Ratio, Market Cap, and Dividend Yield
+                const peRatio = data.PERatio ? data.PERatio : "N/A";
+                const marketCap = data.MarketCapitalization ? `$${(parseInt(data.MarketCapitalization) / 1e9).toFixed(2)} B` : "N/A";
+                const dividendYield = data.DividendYield ? `${data.DividendYield}%` : "N/A";
+
+                // Populate the additional stock data
+                document.getElementById(`resultPERatio${stockNumber}`).textContent = peRatio;
+                document.getElementById(`resultMarketCap${stockNumber}`).textContent = marketCap;
+                document.getElementById(`resultDividendYield${stockNumber}`).textContent = dividendYield;
+
+                // Show the comparison results
+                document.getElementById('comparisonResult').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error fetching data from Alpha Vantage:', error);
+                alert(`Failed to fetch detailed data for ${symbol}. Please try again later.`);
+            });
+    }
+
+    function fetchGraphData(symbol, price) {
+        const graphEndpoint = 'http://127.0.0.1:5001/generate'; // Graph microservice endpoint
+
+        const stockData = {
+            stock1: {
+                symbol: symbol,
+                price: price,
+                peRatio: 0,
+                marketCap: 0,
+                dividend: 0,
+                volume: 0
+            },
+            stock2: {
+                symbol: symbol,
+                price: price,
+                peRatio: 0,
+                marketCap: 0,
+                dividend: 0,
+                volume: 0
+            }
+        };
+
+        fetch(graphEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(stockData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.image) {
+                const img = document.getElementById("comparisonGraph");
+                img.src = "data:image/png;base64," + data.image;
+                document.getElementById('comparisonResult').style.display = 'block';
+            } else {
+                alert('Failed to generate the graph. No image data returned.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching graph data:', error);
+            alert('Failed to fetch graph data. Please try again later.');
+        });
+    }
+</script>
 
 </body>
 </html>
