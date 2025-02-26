@@ -46,3 +46,43 @@ This project was completed as part of **CS361 - Software Engineering I** at Oreg
 1. Clone the repository:
    ```bash
    git clone https://github.com/amchi1205/StockWatch.git
+
+2. Navigate to the project directory:
+bash
+Copy
+cd StockWatch
+Install the required dependencies:
+bash
+Copy
+pip install -r requirements.txt
+Set up your API keys:
+Rename .env.example to .env.
+Add your API keys to the .env file.
+Running the Application
+
+Start the Flask server:
+bash
+Copy
+python app.py
+Open your browser and navigate to http://127.0.0.1:5000.
+Future Improvements
+
+SQL Database for Trading Journal: The trading journal currently uses in-memory storage. Future work will include integrating a SQL database to persist trade data.
+User Authentication: Add user accounts to allow multiple users to track their trades independently.
+Advanced Analytics: Implement additional analytics features, such as portfolio performance tracking and risk assessment.
+Improved UI/UX: Enhance the user interface with modern design elements and interactive charts.
+Disclaimer
+
+This project was completed as part of CS361 - Software Engineering I at Oregon State University. It is intended for educational purposes and is not open for contributions or external use.
+
+Copy
+
+---
+
+### **7. Commit and Push**
+Once you’ve made these changes, commit and push them to GitHub:
+
+```bash
+git add .
+git commit -m "Update README, add .env.example, and organize repository structure"
+git push origin main
